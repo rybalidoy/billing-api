@@ -1,16 +1,17 @@
 package dev.rybalidoy.billingapi.controller;
 
 import dev.rybalidoy.billingapi.entity.Bill;
+import dev.rybalidoy.billingapi.helper.FileHelper;
 import dev.rybalidoy.billingapi.service.BillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.text.html.Option;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,5 +38,20 @@ public class Bills {
     @GetMapping("/billingcycle={value}")
     public ResponseEntity<Optional<List<Bill>>> getBillTransactionsByBillingCycle(@PathVariable int value) {
         return new ResponseEntity<Optional<List<Bill>>>(billService.findBillsByBillingCycle(value),HttpStatus.OK);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/add/file", method = RequestMethod.POST)
+    public ResponseEntity<List<Bill>> addListOfTransactions(@RequestParam("file") MultipartFile file) throws IOException {
+        FileHelper helper = new FileHelper();
+        List<Bill> result = helper.readFile(file);
+        try {
+            // Add to database
+            billService.insertList(result);
+        }
+        catch(MultipartException | NullPointerException e) {
+            System.out.println(e.getMessage());
+        }
+        return new ResponseEntity<List<Bill>>(result,HttpStatus.OK);
     }
 }

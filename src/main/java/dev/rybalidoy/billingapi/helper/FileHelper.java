@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class FileHelper {
 
@@ -20,13 +21,17 @@ public class FileHelper {
      *  If file is supported run the function
      */
     public boolean checkSupported(MultipartFile file) {
-        if(file.getContentType().equals("text/plain") || file.getContentType().equals("text/csv")) {
-            return true;
+        try {
+            if(file == null) return false;
+            else return Objects.equals(file.getContentType(), "text/plain") || Objects.equals(file.getContentType(), "text/csv");
+        }
+        catch (NullPointerException e) {
+            System.out.println(e.getMessage());
         }
         return false;
     }
 
-    public List<Bill> readFile(MultipartFile file) throws IOException, NullPointerException {
+    public List<Bill> readFile(MultipartFile file) throws NullPointerException {
         List<Bill> result = new ArrayList<>();
         BufferedReader br;
         if(checkSupported(file)) {
