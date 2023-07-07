@@ -14,11 +14,11 @@ public class BillService {
     @Autowired
     private BillRepository billRepository;
 
-    private List<Bill> fetchAll() {
+    public List<Bill> fetchAll() {
         return billRepository.findAll();
     }
 
-    private void insertList(List<Bill> bills) {
+    public void insertList(List<Bill> bills) {
         billRepository.saveAll(bills);
     }
 
